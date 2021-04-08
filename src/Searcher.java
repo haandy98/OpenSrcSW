@@ -97,7 +97,7 @@ public class Searcher {
         // 문서 아이디 별 가중치 배열 생성
         double[] Qid = new double[size_of_data];
         for (int i = 0; i < size_of_data; i++) {
-            double Sim = CalcSim2(index_w[i], query_w);
+            double Sim = CalcSim(index_w[i], query_w);
             Qid[i] = Sim;
         }
 
@@ -156,7 +156,7 @@ public class Searcher {
         }
     }
 
-    double CalcSim2(double[] index_w, double[] query_w) {
+    double CalcSim(double[] index_w, double[] query_w) {
 
         double Qid_w = InnerProduct(index_w, query_w);
 
