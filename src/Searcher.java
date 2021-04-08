@@ -16,6 +16,7 @@ public class Searcher {
 
     // 참조할 문서의 개수
     int size_of_data = 5;
+    int number_of_result_to_show = 3;
 
     public void Searcher(String recv_path, String query) throws IOException, ParserConfigurationException, SAXException, ClassNotFoundException {
 
@@ -43,57 +44,7 @@ public class Searcher {
         }
 
         // 쿼리문과 해쉬맵 전달
-        double[] calcSim = CalcSim(query, index);
-
-        // 가중치 크기순으로 재배열
-        double tmp1;
-        int tmp2;
-        int[] doc_id = {0, 1, 2, 3, 4};
-        for (int i = 0; i < calcSim.length; i++) {
-            for (int j = i + 1; j < calcSim.length; j++) {
-                if (calcSim[j] > calcSim[i]) {
-                    tmp1 = calcSim[j];
-                    calcSim[j] = calcSim[i];
-                    calcSim[i] = tmp1;
-
-                    tmp2 = doc_id[j];
-                    doc_id[j] = doc_id[i];
-                    doc_id[i] = tmp2;
-                }
-            }
-        }
-
-        // collection.xml로 부터 title 가져오기
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-        Document document = documentBuilder.parse("collection.xml");
-
-        Element root = document.getDocumentElement();
-        NodeList element_doc = root.getElementsByTagName("doc");
-
-        List<String> index_title = new ArrayList<>();
-
-        for (int i = 0; i < element_doc.getLength(); i++) {
-
-            Element element_doc_id = (Element)element_doc.item(i);
-            NodeList element_title = element_doc_id.getElementsByTagName("title");
-
-            Element titleElement = (Element)element_title.item(0);
-            Text titleText = (Text)titleElement.getFirstChild();
-
-            String strTitle = titleText.getData();
-
-            index_title.add(strTitle);
-        }
-
-        // 가중치가 높은 상위 3개 문서 출력
-        for (int i = 0; i < 3; i++) {
-            System.out.println("" + (i+1) + ". " + index_title.get(doc_id[i]));
-        }
-
-    }
-
-    double[] CalcSim(String query, List<List<String>> index) {
+//        double[] calcSim = CalcSim(query, index);
 
         KeywordExtractor ke = new KeywordExtractor();
         KeywordList kl = ke.extractKeyword(query, true);
@@ -144,13 +95,72 @@ public class Searcher {
         // 문서 아이디 별 가중치 배열 생성
         double[] Qid = new double[size_of_data];
         for (int i = 0; i < size_of_data; i++) {
-            double Qid_w = 0;
-            for (int j = 0; j < query_w.length; j++) {
-                Qid_w += (index_w[i][j] * query_w[j]);
-            }
+            double Qid_w = CalcSim(index_w[i], query_w);
             Qid[i] = Qid_w;
         }
 
-        return Qid;
+        // 가중치 크기순으로 재배열
+        double tmp1;
+        int tmp2;
+        int[] doc_id = {0, 1, 2, 3, 4};
+        for (int i = 0; i < Qid.length; i++) {
+            for (int j = i + 1; j < Qid.length; j++) {
+                if (Qid[j] > Qid[i]) {
+                    tmp1 = Qid[j];
+                    Qid[j] = Qid[i];
+                    Qid[i] = tmp1;
+
+                    tmp2 = doc_id[j];
+                    doc_id[j] = doc_id[i];
+                    doc_id[i] = tmp2;
+                }
+            }
+        }
+
+        // collection.xml로 부터 title 가져오기
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+        Document document = documentBuilder.parse("collection.xml");
+
+        Element root = document.getDocumentElement();
+        NodeList element_doc = root.getElementsByTagName("doc");
+
+        List<String> index_title = new ArrayList<>();
+
+        for (int i = 0; i < element_doc.getLength(); i++) {
+
+            Element element_doc_id = (Element)element_doc.item(i);
+            NodeList element_title = element_doc_id.getElementsByTagName("title");
+
+            Element titleElement = (Element)element_title.item(0);
+            Text titleText = (Text)titleElement.getFirstChild();
+
+            String strTitle = titleText.getData();
+
+            index_title.add(strTitle);
+        }
+
+        // 가중치가 높은 상위 3개 문서 출력
+        double Qid_match = 0;
+        for (int i = 0; i < Qid.length; i++) {
+            if (Qid[i] > 0) Qid_match =+ Qid[i];
+        }
+        if (Qid_match == 0) {
+            System.out.println("검색 결과가 없습니다.");
+        } else {
+            for (int i = 0; i < number_of_result_to_show; i++) {
+                if (Qid[i] > 0) System.out.println("" + (i + 1) + ". " + index_title.get(doc_id[i]));
+            }
+        }
+    }
+
+    double CalcSim(double[] index_w, double[] query_w) {
+        double Qid_w = 0;
+
+        for (int j = 0; j < query_w.length; j++) {
+            Qid_w += (index_w[j] * query_w[j]);
+        }
+
+        return Qid_w;
     }
 }
