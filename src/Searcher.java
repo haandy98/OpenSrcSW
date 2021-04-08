@@ -16,6 +16,7 @@ public class Searcher {
 
     // 참조할 문서의 개수
     int size_of_data = 5;
+
     // 출력할 문서의 개수
     int number_of_result_to_show = 3;
 
