@@ -32,9 +32,9 @@ public class Searcher {
         Iterator<String> it = hashMap.keySet().iterator();
 
         List<List<String>> index = new ArrayList<>();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             String read_key = it.next();
-            String read_value = (String)hashMap.get(read_key);
+            String read_value = (String) hashMap.get(read_key);
 
             List<String> index_word = new ArrayList<>();
             index_word.add(read_key);
@@ -131,11 +131,11 @@ public class Searcher {
 
         for (int i = 0; i < element_doc.getLength(); i++) {
 
-            Element element_doc_id = (Element)element_doc.item(i);
+            Element element_doc_id = (Element) element_doc.item(i);
             NodeList element_title = element_doc_id.getElementsByTagName("title");
 
-            Element titleElement = (Element)element_title.item(0);
-            Text titleText = (Text)titleElement.getFirstChild();
+            Element titleElement = (Element) element_title.item(0);
+            Text titleText = (Text) titleElement.getFirstChild();
 
             String strTitle = titleText.getData();
 
@@ -145,7 +145,7 @@ public class Searcher {
         // 가중치가 높은 상위 3개 문서 출력
         double Qid_match = 0;
         for (int i = 0; i < Qid.length; i++) {
-            if (Qid[i] > 0) Qid_match =+ Qid[i];
+            if (Qid[i] > 0) Qid_match = +Qid[i];
         }
         if (Qid_match == 0) {
             System.out.println("검색 결과가 없습니다.");
@@ -156,7 +156,7 @@ public class Searcher {
         }
     }
 
-    double CalcSim(double[] index_w, double[] query_w) {
+    double CalcSim2(double[] index_w, double[] query_w) {
 
         double Qid_w = 0;
         for (int i = 0; i < query_w.length; i++) {
@@ -177,6 +177,6 @@ public class Searcher {
 
         double Sim = Qid_w / (s_index_w * s_query_w);
 
-        return Math.round(Sim * 100)/100.0;
+        return Math.round(Sim * 100) / 100.0;
     }
 }
