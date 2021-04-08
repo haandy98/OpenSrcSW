@@ -97,7 +97,7 @@ public class Searcher {
         // 문서 아이디 별 가중치 배열 생성
         double[] Qid = new double[size_of_data];
         for (int i = 0; i < size_of_data; i++) {
-            double Sim = CalcSim(index_w[i], query_w);
+            double Sim = CalcSim2(index_w[i], query_w);
             Qid[i] = Sim;
         }
 
@@ -158,10 +158,7 @@ public class Searcher {
 
     double CalcSim2(double[] index_w, double[] query_w) {
 
-        double Qid_w = 0;
-        for (int i = 0; i < query_w.length; i++) {
-            Qid_w += (index_w[i] * query_w[i]);
-        }
+        double Qid_w = InnerProduct(index_w, query_w);
 
         double s_index_w = 0;
         for (int i = 0; i < query_w.length; i++) {
@@ -178,5 +175,14 @@ public class Searcher {
         double Sim = Qid_w / (s_index_w * s_query_w);
 
         return Math.round(Sim * 100) / 100.0;
+    }
+
+    double InnerProduct(double[] index_w, double[] query_w) {
+        double Qid_w = 0;
+        for (int i = 0; i < query_w.length; i++) {
+            Qid_w += (index_w[i] * query_w[i]);
+        }
+
+        return Qid_w;
     }
 }
